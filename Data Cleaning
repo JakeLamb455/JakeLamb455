@@ -1,0 +1,85 @@
+#import libraries
+import pandas as pd
+import numpy as np
+pd.set_option('display.max_columns', None)
+
+#import data set
+log = pd.read_csv(r"C:\Users\jalamb\OneDrive - Neurocrine Biosciences Inc\Summer Intern 2022\Shipping Status untouched.csv")
+
+#Clean the cells/create new cleaned lot and quant cells
+i = 0
+lots = []
+quant = []
+while i < len(log["Lot Number(s)"]):
+    x = str(log["Lot Number(s)"][i])
+    y = str(log["Quantity"][i])
+    w = x.replace(',',"\n").replace('  ', '\n')
+    lots.append(w.split("\n"))
+    quant.append(y.split("\n"))
+    i = i + 1
+
+log['Lot Number'] = lots
+log["clean_quant"] = quant
+
+#Function to determine if an index exists given a list (cell)
+def indexExists(list,index):
+    try:
+        list[index]
+        return True
+    except IndexError:
+        return False
+    
+#Created a new dataframe with every lot number and every quantity in their own cell (2 columns)
+w = 0
+t = 0
+lo_list = []
+quant_list = []
+while w < len(log["Lot Number"]):
+    t= 0
+    while t < len(log['Lot Number'][w]):
+        lo_list.append(log['Lot Number'][w][t])
+        if indexExists(log['clean_quant'][w], t) == True:
+            quant_list.append(log['clean_quant'][w][t])
+        else:
+            quant_list.append('nan')
+            
+        t = t + 1
+    w = w + 1
+    
+data = {'lot': lo_list,
+        'Quant': quant_list}
+
+lot_quant = pd.DataFrame(data)
+
+#Function from github that works similar to the pbi split by delimiter (using this to split the non lot/quanitity columns up)
+#https://gist.github.com/jlln/338b4b0b55bd6984f883?permalink_comment_id=2359013#gistcomment-2359013
+def splitDataFrameList(df,target_column,separator):
+    
+    row_accumulator = []
+
+    def splitListToRows(row, separator):
+        split_row = str(row[target_column]).split(separator)
+        for s in split_row:
+            new_row = row.to_dict()
+            new_row[target_column] = s
+            row_accumulator.append(new_row)
+
+    df.apply(splitListToRows, axis=1, args = (separator, ))
+    new_df = pd.DataFrame(row_accumulator)
+    return new_df
+
+#Calling the above function on our dataframe using a Carriage return as the delimiter with a new df as an output
+split_by_lot = splitDataFrameList(df = log, target_column = "Lot Number", separator = ",")
+
+#Adding the cleaned Lot Number and Quanity columns to the newly created table
+split_by_lot["Lot number"] = lot_quant['lot']
+split_by_lot['Quant'] = lot_quant['Quant']
+
+#Cleaning up the column names
+Supply_Log = split_by_lot.rename(columns={"Quant": "QUANTITY"})
+
+#Rearranging columns
+cols = ['Product', "Program", "Origin", "Destination", "Lot number", "QUANTITY", "Unit of Measure", "Ship Date", "Received Date", 'API Minutes', 'Drug Product Minutes', "DP Meeting Comments", "Comments"]
+
+Supply_Log_Complete = Supply_Log[cols]
+Supply_Log_Complete
