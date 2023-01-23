@@ -1,0 +1,59 @@
+#dependencies
+import pandas as pd
+import numpy as np
+from datascience import *
+import matplotlib.pyplot as plt
+#data
+pd.set_option('display.max_columns', None)
+LAL = pd.read_csv("[2022-10-20]-0022200016-LAC@LAL.csv")
+SAC = pd.read_csv("[2022-10-22]-0022200036-LAC@SAC.csv")
+PHX = pd.read_csv("[2022-10-23]-0022200043-PHX@LAC.csv")
+OKC = pd.read_csv("[2022-10-25]-0022200054-LAC@OKC.csv")
+OKC2 = pd.read_csv("[2022-10-27]-0022200067-LAC@OKC.csv")
+NOP = pd.read_csv("[2022-10-30]-0022200088-NOP@LAC.csv")
+HOU = pd.read_csv("[2022-10-31]-0022200102-HOU@LAC.csv")
+HOU2 = pd.read_csv("[2022-11-02]-0022200112-LAC@HOU.csv")
+SAS = pd.read_csv("[2022-11-04]-0022200126-LAC@SAS.csv")
+UTA = pd.read_csv("[2022-11-06]-0022200143-UTA@LAC.csv")
+CLE = pd.read_csv("[2022-11-07]-0022200158-CLE@LAC.csv")
+COMB = pd.read_csv("[10-18-2022]-[11-07-2022]-combined-stats.csv")
+ALL_LAC = pd.concat([LAL, SAC, PHX, OKC, OKC2, NOP, HOU, HOU2, SAS, UTA, CLE])
+Just_LAC = ALL_LAC.loc[ALL_LAC['team'] == 'LAC']
+Just_LAC['points'] = Just_LAC['points'].fillna(0)
+ppg = sum(Just_LAC['points'])/11
+LA_dist = Just_LAC.loc[Just_LAC['result'].isin(['made', 'missed'])]
+LA_dist = LA_dist.dropna(subset=['shot_distance'])
+all_dist = COMB.loc[COMB['result'].isin(['made', 'missed'])]
+lzero_5 = all_dist.loc[all_dist['shot_distance'].between(0,5)]
+zer_5_pct = len(lzero_5.loc[lzero_5['result']== 'made'])/len(lzero_5)*100
+print(f'All NBA 0-5 ft Shooting %: {zer_5_pct:.2f}')
+l5_10 = all_dist.loc[all_dist['shot_distance'].between(5,10)]
+l5_10_pct = len(l5_10.loc[l5_10['result']== 'made'])/len(l5_10)*100
+print(f'All NBA 5-10 ft Shooting %: {l5_10_pct:.2f}')
+l10_15 = all_dist.loc[all_dist['shot_distance'].between(10,15)]
+l10_15_pct = len(l10_15.loc[l10_15['result']== 'made'])/len(l10_15)*100
+print(f'All NBA 10-15 ft Shooting %: {l10_15_pct:.2f}')
+l15_20 = all_dist.loc[all_dist['shot_distance'].between(15,20)]
+l15_20_pct = len(l15_20.loc[l15_20['result']== 'made'])/len(l15_20)*100
+print(f'All NBA 15-20 ft Shooting %: {l15_20_pct:.2f}')
+l20_25 = all_dist.loc[all_dist['shot_distance'].between(20,25)]
+l20_25_pct = len(l20_25.loc[l20_25['result']== 'made'])/len(l20_25)*100
+print(f'All NBA 20-25 ft Shooting %: {l20_25_pct:.2f}')
+l25_30 = all_dist.loc[all_dist['shot_distance'] > 25]
+l25_30_pct = len(l25_30.loc[l25_30['result']== 'made'])/len(l25_30)*100
+print(f'All NBA >25 ft Shooting %: {l25_30_pct:.2f}')
+columns = ['Distance', 'Clippers', 'All NBA']
+eval_tbl = Table(columns)
+eval_tbl.append(['0-5 ft', azer_5_pct, zer_5_pct])
+eval_tbl.append(['5-10 ft', al5_10_pct, l5_10_pct])
+eval_tbl.append(['10-15 ft', al10_15_pct, l10_15_pct])
+eval_tbl.append(['15-20 ft', al15_20_pct, l15_20_pct])
+eval_tbl.append(['20-25 ft', al20_25_pct, l20_25_pct])
+eval_tbl.append(['> 25 ft', al25_30_pct, l25_30_pct])
+plotdata = pd.DataFrame(
+    {"Clippers": [azer_5_pct, al5_10_pct, al10_15_pct, al15_20_pct, al20_25_pct, al25_30_pct],
+    "All NBA": [zer_5_pct, l5_10_pct, l10_15_pct, l15_20_pct, l20_25_pct, l25_30_pct]}, 
+    index=["0-5 ft", "5-10 ft", "10-15 ft", "15-20 ft", "20-25 ft", ">25 ft"])
+# Plot a bar chart
+plotdata.plot(kind="bar")
+eval_tbl
