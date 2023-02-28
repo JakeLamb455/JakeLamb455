@@ -1,3 +1,5 @@
+#Problem to solve: Columns with multiple data points in them that need to be seperated with some values not lining up with values in other columns
+
 #import libraries
 import pandas as pd
 import numpy as np
