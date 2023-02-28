@@ -83,3 +83,4 @@ cols = ['Product', "Program", "Origin", "Destination", "Lot number", "QUANTITY",
 
 Supply_Log_Complete = Supply_Log[cols]
 Supply_Log_Complete
+
