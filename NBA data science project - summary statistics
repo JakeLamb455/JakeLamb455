@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datascience import *
 import matplotlib.pyplot as plt
+
 #data
 pd.set_option('display.max_columns', None)
 LAL = pd.read_csv("[2022-10-20]-0022200016-LAC@LAL.csv")
@@ -17,9 +18,13 @@ SAS = pd.read_csv("[2022-11-04]-0022200126-LAC@SAS.csv")
 UTA = pd.read_csv("[2022-11-06]-0022200143-UTA@LAC.csv")
 CLE = pd.read_csv("[2022-11-07]-0022200158-CLE@LAC.csv")
 COMB = pd.read_csv("[10-18-2022]-[11-07-2022]-combined-stats.csv")
+
+#Group by Clippers
 ALL_LAC = pd.concat([LAL, SAC, PHX, OKC, OKC2, NOP, HOU, HOU2, SAS, UTA, CLE])
 Just_LAC = ALL_LAC.loc[ALL_LAC['team'] == 'LAC']
 Just_LAC['points'] = Just_LAC['points'].fillna(0)
+
+#Statistics
 ppg = sum(Just_LAC['points'])/11
 LA_dist = Just_LAC.loc[Just_LAC['result'].isin(['made', 'missed'])]
 LA_dist = LA_dist.dropna(subset=['shot_distance'])
